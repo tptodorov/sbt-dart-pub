@@ -17,6 +17,8 @@ object Plugin extends sbt.Plugin {
   val defaultSettings = Seq(
     Keys.dartSourceFolder := file("src/main/dart"),
     Keys.dartTargetFolder := (resourceManaged in Compile).value / "public",
+    cleanFiles <+= Keys.dartSourceFolder { base => base / "build" },
+
 
     Keys.`pub-build` := {
       val s: TaskStreams = streams.value
@@ -27,7 +29,7 @@ object Plugin extends sbt.Plugin {
       val s: TaskStreams = streams.value
       // use "pub build" to build the dart package
       run(
-        Process(Seq("pub", "serve"), Keys.dartSourceFolder.value),
+        Process(Seq("pub", "serve", "--mode=debug", "--force-poll"), Keys.dartSourceFolder.value),
         s.log)
     },
 
