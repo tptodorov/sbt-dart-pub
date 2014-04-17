@@ -9,6 +9,7 @@ object Plugin extends sbt.Plugin {
   object Keys {
     // pub build
     val `pub-build` = taskKey[Seq[File]]("runs pub build in dart folder.")
+    val `pub-build-debug` = taskKey[Seq[File]]("runs pub build in debug mode.")
     val `pub-serve` = taskKey[Unit]("runs pub serve in dart folder.")
     val dartSourceFolder = settingKey[File]("folder for the Dart sources. Should contain pubspec.yaml.")
     val dartTargetFolder = settingKey[File]("folder where Dart build output is copied. By default in src/main/resources/public")
@@ -23,6 +24,11 @@ object Plugin extends sbt.Plugin {
     Keys.`pub-build` := {
       val s: TaskStreams = streams.value
       pub_build(Keys.dartSourceFolder.value, Keys.dartTargetFolder.value, s.log).toSeq
+    },
+
+    Keys.`pub-build-debug` := {
+      val s: TaskStreams = streams.value
+      pub_build(Keys.dartSourceFolder.value, Keys.dartTargetFolder.value, s.log, Seq("pub", "build", "--mode", "debug")).toSeq
     },
 
     Keys.`pub-serve` := {
@@ -52,14 +58,14 @@ object Plugin extends sbt.Plugin {
     }
   )
 
-  private def pub_build(dartSource: File, targetFolder: File, log: Logger): Set[File] = {
+  private def pub_build(dartSource: File, targetFolder: File, log: Logger, cmd: Seq[String] = Seq("pub", "build")): Set[File] = {
 
 
     log.info(s"Dart pub build in $dartSource")
 
     // use "pub build" to build the dart package
     run(
-      Process(Seq("pub", "build"), dartSource),
+      Process(cmd, dartSource),
       log)
 
     IO.copyDirectory(dartSource / "build/web", targetFolder, true)
