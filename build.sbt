@@ -1,3 +1,5 @@
+import bintray.Keys._
+
 sbtPlugin := true
 
 name := "sbt-dart-pub"
@@ -6,18 +8,9 @@ organization := "com.github.tptodorov"
 
 version := "0.0.1"
 
-publishTo <<= (version) { version: String =>
-   val scalasbt = "http://scalasbt.artifactoryonline.com/scalasbt/"
-   val (name, url) = if (version.contains("-SNAPSHOT"))
-                       ("sbt-plugin-snapshots-publish", scalasbt+"sbt-plugin-snapshots")
-                     else
-                       ("sbt-plugin-releases-publish", scalasbt+"sbt-plugin-releases")
-   Some(Resolver.url(name, new URL(url))(Resolver.ivyStylePatterns))
-}
-
-publishMavenStyle := false
-
 scalacOptions += "-deprecation"
+
+licenses += ("MIT", url("http://opensource.org/licenses/MIT"))
 
 crossBuildingSettings
 
@@ -30,3 +23,13 @@ scriptedLaunchOpts <<= (scriptedLaunchOpts, version) { case (s,v) => s ++
 }
 
 scriptedBufferLog := false
+
+bintraySettings
+
+packageLabels in bintray := Seq("dart", "compile")
+
+publishMavenStyle := false
+
+repository in bintray := "sbt-plugins"
+
+bintrayOrganization in bintray := None
